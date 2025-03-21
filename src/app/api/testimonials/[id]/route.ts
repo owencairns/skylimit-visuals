@@ -1,15 +1,15 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { db, doc, getDoc, setDoc, deleteDoc } from "@/lib/firebase";
 import { Testimonial } from "@/types/testimonial";
 import { deleteImage } from "@/lib/uploadUtils";
 
 // GET a specific testimonial
 export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   try {
-    const id = params.id;
     const testimonialRef = doc(db, "testimonials", id);
     const testimonialSnap = await getDoc(testimonialRef);
 
@@ -32,9 +32,10 @@ export async function GET(
 
 // PUT to update or create a testimonial
 export async function PUT(
-  request: NextRequest,
-  { params }: { params: { id: string } }
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   try {
     // Verify authentication
     const authHeader = request.headers.get("Authorization");
@@ -42,7 +43,6 @@ export async function PUT(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const id = params.id;
     const data = await request.json();
 
     // Validate required fields
@@ -86,17 +86,16 @@ export async function PUT(
 
 // DELETE a testimonial
 export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { id: string } }
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   try {
     // Verify authentication
     const authHeader = request.headers.get("Authorization");
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-
-    const id = params.id;
 
     // Get the testimonial to find its image path
     const testimonialRef = doc(db, "testimonials", id);

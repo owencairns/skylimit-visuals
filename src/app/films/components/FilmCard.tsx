@@ -8,6 +8,8 @@ export type FilmStory = {
   imageUrl: string;
   youtubeUrl: string;
   isNew?: boolean;
+  isTeaser?: boolean;
+  isEngagement?: boolean;
 };
 
 interface FilmCardProps {

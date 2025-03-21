@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { SiteImage } from "../types/image";
 import {
   fetchAllSiteImages,
-  fetchPageImages,
   fetchImageById,
+  fetchPageImages,
 } from "../lib/imageUtils";
 
 interface UseFirebaseImagesReturn {
@@ -23,7 +23,7 @@ export const useAllFirebaseImages = (): UseFirebaseImagesReturn => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);
 
-  const fetchImages = async () => {
+  const fetchImages = useCallback(async () => {
     try {
       setLoading(true);
       const fetchedImages = await fetchAllSiteImages();
@@ -36,11 +36,11 @@ export const useAllFirebaseImages = (): UseFirebaseImagesReturn => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchImages();
-  }, []);
+  }, [fetchImages]);
 
   return { images, loading, error, refetch: fetchImages };
 };
@@ -55,7 +55,7 @@ export const usePageFirebaseImages = (
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);
 
-  const fetchImages = async () => {
+  const fetchImages = useCallback(async () => {
     try {
       setLoading(true);
       const fetchedImages = await fetchPageImages(page);
@@ -68,11 +68,11 @@ export const usePageFirebaseImages = (
     } finally {
       setLoading(false);
     }
-  };
+  }, [page]);
 
   useEffect(() => {
     fetchImages();
-  }, [page]);
+  }, [fetchImages]);
 
   return { images, loading, error, refetch: fetchImages };
 };
@@ -92,7 +92,7 @@ export const useFirebaseImage = (
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);
 
-  const fetchImage = async () => {
+  const fetchImage = useCallback(async () => {
     try {
       setLoading(true);
       const fetchedImage = await fetchImageById(id);
@@ -105,31 +105,29 @@ export const useFirebaseImage = (
     } finally {
       setLoading(false);
     }
-  };
+  }, [id]);
 
   useEffect(() => {
     fetchImage();
-  }, [id]);
+  }, [fetchImage]);
 
   return { image, loading, error, refetch: fetchImage };
 };
 
 /**
- * Hook to fetch images for a specific section
+ * Hook to fetch images by section
  */
 export const useSectionFirebaseImages = (
-  section: SiteImage["section"]
+  section: string
 ): UseFirebaseImagesReturn => {
   const [images, setImages] = useState<SiteImage[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);
 
-  const fetchImages = async () => {
+  const fetchImages = useCallback(async () => {
     try {
       setLoading(true);
-      // First fetch all images
       const allImages = await fetchAllSiteImages();
-      // Then filter by section
       const sectionImages = allImages.filter((img) => img.section === section);
       setImages(sectionImages);
       setError(null);
@@ -140,11 +138,11 @@ export const useSectionFirebaseImages = (
     } finally {
       setLoading(false);
     }
-  };
+  }, [section]);
 
   useEffect(() => {
     fetchImages();
-  }, [section]);
+  }, [fetchImages]);
 
   return { images, loading, error, refetch: fetchImages };
 };
