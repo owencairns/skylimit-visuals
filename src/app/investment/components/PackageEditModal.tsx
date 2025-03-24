@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import Image from 'next/image';
 import toast from 'react-hot-toast';
@@ -34,7 +34,7 @@ export default function PackageEditModal({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Create a new package object
-  const createNewPackage = (type: 'videography' | 'photography' = initialType) => {
+  const createNewPackage = useCallback((type: 'videography' | 'photography' = initialType) => {
     // Generate a unique ID using timestamp
     const timestamp = Date.now();
     const randomSuffix = Math.random().toString(36).substring(2, 15);
@@ -59,7 +59,7 @@ export default function PackageEditModal({
       order: maxOrder + 1, // Place at the end
       isNew: true
     };
-  };
+  }, [packages, initialType]);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -121,7 +121,7 @@ export default function PackageEditModal({
   useEffect(() => {
     if (isOpen) {
       if (initialMode === 'add' || packages.length === 0) {
-        const newPackage = createNewPackage(initialType);
+        const newPackage = createNewPackage();
         setSelectedPackage(newPackage);
         setEditedPackage(newPackage);
         setActiveTab('add');
@@ -143,7 +143,7 @@ export default function PackageEditModal({
       setSelectedFile(null);
       setPreviewUrl(null);
     };
-  }, [isOpen, initialMode, initialType, packages]);
+  }, [isOpen, initialMode, packages, createNewPackage]);
 
   if (!isOpen || !user) return null;
 

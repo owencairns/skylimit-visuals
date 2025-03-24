@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import Image from 'next/image';
 import toast from 'react-hot-toast';
@@ -32,7 +32,7 @@ export default function FilmEditModal({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Create a new film object
-  const createNewFilm = () => {
+  const createNewFilm = useCallback(() => {
     // Generate a unique ID using timestamp
     const timestamp = Date.now();
     const randomSuffix = Math.random().toString(36).substring(2, 15);
@@ -53,7 +53,7 @@ export default function FilmEditModal({
       order: maxOrder + 1, // Place at the end
       isNew: true
     };
-  };
+  }, [films]);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -107,7 +107,7 @@ export default function FilmEditModal({
       setSelectedFile(null);
       setPreviewUrl(null);
     };
-  }, [isOpen, initialMode, films]);
+  }, [isOpen, initialMode, films, createNewFilm]);
 
   if (!isOpen || !user) return null;
 
