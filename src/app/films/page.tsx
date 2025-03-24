@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
+import { collection, query, onSnapshot, setDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import FilmCard from './components/FilmCard';
 import FilmsCTA from './components/FilmsCTA';
@@ -17,16 +17,32 @@ export default function FilmsPage() {
   const [showEditButton, setShowEditButton] = useState(false);
 
   useEffect(() => {
-    // Subscribe to films collection
-    const q = query(collection(db, 'films'), orderBy('title'));
+    // Subscribe to films collection - don't order by order initially
+    const q = query(collection(db, 'films'));
     
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const filmsData = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      })) as FilmStory[];
+      const filmsData = snapshot.docs.map((doc, index) => {
+        const data = doc.data();
+        // If order is not set, use the index as a default order
+        if (typeof data.order !== 'number') {
+          data.order = index;
+          // Update the document with the default order
+          setDoc(doc.ref, { order: index }, { merge: true });
+        }
+        return {
+          id: doc.id,
+          ...data
+        } as FilmStory;
+      });
       
-      setFilms(filmsData);
+      // Sort the films by order after we ensure all have an order value
+      const sortedFilms = [...filmsData].sort((a, b) => {
+        const orderA = typeof a.order === 'number' ? a.order : 0;
+        const orderB = typeof b.order === 'number' ? b.order : 0;
+        return orderA - orderB;
+      });
+      
+      setFilms(sortedFilms);
       setIsLoading(false);
     }, (error) => {
       console.error('Error fetching films:', error);
@@ -64,6 +80,10 @@ export default function FilmsPage() {
         {isLoading ? (
           <div className="flex justify-center items-center h-64">
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-black"></div>
+          </div>
+        ) : films.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-gray-500">No films available. {user && 'Click "Manage Films" to add some!'}</p>
           </div>
         ) : (
           <div className="divide-y divide-gray-100">

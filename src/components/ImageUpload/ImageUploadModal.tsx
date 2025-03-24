@@ -28,26 +28,36 @@ export default function ImageUploadModal({ isOpen, onClose, image, onSuccess }: 
     if (!file) return;
 
     // Check file type
-    const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+    const validImageTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+    const validVideoTypes = ['video/mp4', 'video/webm', 'video/ogg', 'video/quicktime'];
+    const validTypes = [...validImageTypes, ...validVideoTypes];
+    
     if (!validTypes.includes(file.type)) {
-      toast.error('Please select a valid image file (JPEG, PNG, WEBP, or GIF)');
+      toast.error('Please select a valid image or video file (JPEG, PNG, WEBP, GIF, MP4, WEBM, OGG, MOV)');
       return;
     }
 
-    // Check file size (max 5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error('File size must be less than 5MB');
+    // Check file size (max 5MB for images, 100MB for videos)
+    const isVideo = validVideoTypes.includes(file.type);
+    const maxSize = isVideo ? 100 * 1024 * 1024 : 5 * 1024 * 1024;
+    if (file.size > maxSize) {
+      toast.error(`File size must be less than ${isVideo ? '100MB' : '5MB'}`);
       return;
     }
 
     setSelectedFile(file);
     
     // Create preview URL
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setPreviewUrl(reader.result as string);
-    };
-    reader.readAsDataURL(file);
+    if (isVideo) {
+      const videoUrl = URL.createObjectURL(file);
+      setPreviewUrl(videoUrl);
+    } else {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreviewUrl(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleUpload = async () => {
@@ -93,6 +103,7 @@ export default function ImageUploadModal({ isOpen, onClose, image, onSuccess }: 
                 src={image.url} 
                 className="w-full h-full object-cover"
                 controls
+                playsInline
               />
             ) : (
               <Image
@@ -107,7 +118,7 @@ export default function ImageUploadModal({ isOpen, onClose, image, onSuccess }: 
         </div>
 
         <div className="mb-6">
-          <h3 className="text-lg font-semibold mb-2">Upload New Image</h3>
+          <h3 className="text-lg font-semibold mb-2">Upload New {image.type === 'video' ? 'Video' : 'Image'}</h3>
           <div 
             className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center cursor-pointer hover:bg-gray-50"
             onClick={() => fileInputRef.current?.click()}
@@ -116,18 +127,27 @@ export default function ImageUploadModal({ isOpen, onClose, image, onSuccess }: 
               type="file"
               ref={fileInputRef}
               className="hidden"
-              accept="image/*"
+              accept={image.type === 'video' ? "video/*" : "image/*"}
               onChange={handleFileChange}
             />
             
             {previewUrl ? (
               <div className="relative w-full h-64">
-                <Image
-                  src={previewUrl}
-                  alt="Preview"
-                  fill
-                  className="object-cover rounded-lg"
-                />
+                {image.type === 'video' ? (
+                  <video 
+                    src={previewUrl}
+                    className="w-full h-full object-cover"
+                    controls
+                    playsInline
+                  />
+                ) : (
+                  <Image
+                    src={previewUrl}
+                    alt="Preview"
+                    fill
+                    className="object-cover rounded-lg"
+                  />
+                )}
               </div>
             ) : (
               <div className="py-8">
@@ -138,7 +158,7 @@ export default function ImageUploadModal({ isOpen, onClose, image, onSuccess }: 
                   Click to select a file or drag and drop
                 </p>
                 <p className="mt-1 text-xs text-gray-400">
-                  PNG, JPG, WEBP, GIF up to 5MB
+                  {image.type === 'video' ? 'MP4, WEBM, OGG, MOV up to 100MB' : 'PNG, JPG, WEBP, GIF up to 5MB'}
                 </p>
               </div>
             )}

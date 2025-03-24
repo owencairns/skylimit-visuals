@@ -10,34 +10,27 @@ export default function PackageCard({ package: pkg }: PackageCardProps) {
   const { title, subtitle, description, imageUrl, price, features } = pkg;
 
   return (
-    <div className="group flex flex-col bg-white rounded-xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-1">
-      {/* Image */}
+    <div className="flex flex-col bg-white rounded-lg shadow-lg overflow-hidden transition-transform hover:scale-[1.02]">
       <div className="relative w-full aspect-[4/3] overflow-hidden">
         <Image
-          src={imageUrl || '/images/placeholder-package.jpg'}
+          src={imageUrl}
           alt={`${title} package`}
           fill
-          className="object-cover transition-transform duration-300 group-hover:scale-105"
+          className="object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
       </div>
       
-      {/* Content */}
-      <div className="flex flex-col flex-1 p-6">
-        {/* Title & Price */}
-        <div className="mb-4">
-          <h3 className="text-2xl font-medium text-brand-blue">{title}</h3>
-          {subtitle && (
-            <p className="text-sm uppercase tracking-wider text-gray-500 mt-1">{subtitle}</p>
-          )}
-          <div className="text-2xl font-medium text-brand-blue mt-2">{price}</div>
-        </div>
+      <div className="p-6 flex flex-col flex-1">
+        <h3 className="text-2xl font-medium text-brand-blue mb-1">{title}</h3>
+        {subtitle && (
+          <p className="text-sm uppercase tracking-wider text-gray-500 mb-2">{subtitle}</p>
+        )}
         
-        {/* Description */}
-        <p className="text-gray-600 mb-6">{description}</p>
+        <p className="text-gray-600 mb-4">{description}</p>
         
-        {/* Features */}
-        <div className="flex-1 mb-6">
+        <div className="text-2xl font-medium text-brand-blue mb-6">{price}</div>
+        
+        <div className="flex-1">
           <ul className="space-y-3">
             {features.map((feature, index) => (
               <li key={index} className="flex items-start space-x-2">
@@ -57,10 +50,9 @@ export default function PackageCard({ package: pkg }: PackageCardProps) {
           </ul>
         </div>
         
-        {/* CTA Button */}
         <Link 
           href="/contact" 
-          className="block w-full text-center bg-brand-blue text-white px-6 py-3 rounded-md hover:bg-brand-blue/90 transition-colors"
+          className="mt-6 inline-block w-full text-center bg-brand-blue text-white px-6 py-3 rounded-md hover:bg-brand-blue/90 transition-colors"
         >
           Book Now
         </Link>

@@ -15,6 +15,7 @@ export async function POST(request: NextRequest) {
     const file = formData.get("file") as unknown as Blob;
     const imagePath = formData.get("imagePath") as string;
     const imageId = formData.get("imageId") as string;
+    const type = formData.get("type") as "image" | "video";
 
     if (!file || !imagePath) {
       return NextResponse.json(
@@ -23,7 +24,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log(`Starting upload for ${imagePath}`);
+    console.log(`Starting upload for ${type} at ${imagePath}`);
 
     // Get the file data as buffer
     const fileData = await file.arrayBuffer();
@@ -34,12 +35,13 @@ export async function POST(request: NextRequest) {
     const bucket = storage.bucket();
 
     // Upload the file
-    const fileRef = bucket.file(imagePath.replace(/^\//, "")); // Remove leading slash if present
+    const fileRef = bucket.file(imagePath.replace(/^\//, ""));
 
     try {
       await fileRef.save(buffer, {
         metadata: {
-          contentType: file.type || "image/jpeg",
+          contentType:
+            file.type || (type === "video" ? "video/mp4" : "image/jpeg"),
           cacheControl: "public, max-age=31536000", // Cache for 1 year
         },
       });
@@ -79,7 +81,7 @@ export async function POST(request: NextRequest) {
           error:
             uploadError instanceof Error
               ? uploadError.message
-              : "Failed to upload to Firebase Storage",
+              : `Failed to upload ${type} to Firebase Storage`,
         },
         { status: 500 }
       );
@@ -87,7 +89,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error("Error handling upload request:", error);
     return NextResponse.json(
-      { error: "Failed to upload image" },
+      { error: "Failed to process upload request" },
       { status: 500 }
     );
   }

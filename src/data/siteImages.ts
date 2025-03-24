@@ -57,8 +57,8 @@ export const siteImages: SiteImage[] = [
     alt: "Sky Limit Visuals Team",
     page: "home",
     section: "team",
-    width: 500,
-    height: 500,
+    width: 1000,
+    height: 1000,
     type: "image",
   },
   // Testimonial Images

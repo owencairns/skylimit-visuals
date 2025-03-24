@@ -7,6 +7,7 @@ import {
   fetchImageById,
   fetchPageImages,
 } from "../lib/imageUtils";
+import { imageUpdateEmitter } from "../lib/uploadUtils";
 
 interface UseFirebaseImagesReturn {
   images: SiteImage[];
@@ -40,6 +41,14 @@ export const useAllFirebaseImages = (): UseFirebaseImagesReturn => {
 
   useEffect(() => {
     fetchImages();
+    // Listen for image updates
+    const handleImageUpdate = () => {
+      fetchImages();
+    };
+    imageUpdateEmitter.on("imageUpdated", handleImageUpdate);
+    return () => {
+      imageUpdateEmitter.off("imageUpdated", handleImageUpdate);
+    };
   }, [fetchImages]);
 
   return { images, loading, error, refetch: fetchImages };
@@ -72,7 +81,17 @@ export const usePageFirebaseImages = (
 
   useEffect(() => {
     fetchImages();
-  }, [fetchImages]);
+    // Listen for image updates for this page
+    const handleImageUpdate = (data: { page: string }) => {
+      if (data.page === page) {
+        fetchImages();
+      }
+    };
+    imageUpdateEmitter.on("imageUpdated", handleImageUpdate);
+    return () => {
+      imageUpdateEmitter.off("imageUpdated", handleImageUpdate);
+    };
+  }, [fetchImages, page]);
 
   return { images, loading, error, refetch: fetchImages };
 };
@@ -109,7 +128,17 @@ export const useFirebaseImage = (
 
   useEffect(() => {
     fetchImage();
-  }, [fetchImage]);
+    // Listen for updates to this specific image
+    const handleImageUpdate = (data: { id: string }) => {
+      if (data.id === id) {
+        fetchImage();
+      }
+    };
+    imageUpdateEmitter.on("imageUpdated", handleImageUpdate);
+    return () => {
+      imageUpdateEmitter.off("imageUpdated", handleImageUpdate);
+    };
+  }, [fetchImage, id]);
 
   return { image, loading, error, refetch: fetchImage };
 };
@@ -142,7 +171,17 @@ export const useSectionFirebaseImages = (
 
   useEffect(() => {
     fetchImages();
-  }, [fetchImages]);
+    // Listen for image updates for this section
+    const handleImageUpdate = (data: { section: string }) => {
+      if (data.section === section) {
+        fetchImages();
+      }
+    };
+    imageUpdateEmitter.on("imageUpdated", handleImageUpdate);
+    return () => {
+      imageUpdateEmitter.off("imageUpdated", handleImageUpdate);
+    };
+  }, [fetchImages, section]);
 
   return { images, loading, error, refetch: fetchImages };
 };

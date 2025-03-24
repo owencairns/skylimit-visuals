@@ -7,6 +7,7 @@ export type FilmStory = {
   description: string;
   imageUrl: string;
   youtubeUrl: string;
+  order: number;
   isNew?: boolean;
   isTeaser?: boolean;
   isEngagement?: boolean;
