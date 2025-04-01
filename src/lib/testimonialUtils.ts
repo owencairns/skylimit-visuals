@@ -134,13 +134,20 @@ export const uploadTestimonialImage = async (
     // Get the user's ID token
     const idToken = await user.getIdToken();
 
+    // Determine file extension from the actual file
+    const fileExtension = file.name.split(".").pop() || "jpg";
+    const imagePath = `/home/testimonial-${testimonialId}.${fileExtension}`;
+    const imageId = `testimonial-${testimonialId}`;
+
     // Create form data
     const formData = new FormData();
     formData.append("file", file);
-    formData.append("testimonialId", testimonialId.toString());
+    formData.append("imagePath", imagePath);
+    formData.append("imageId", imageId);
+    formData.append("type", "image");
 
     // Send the request to the API
-    const response = await fetch("/api/testimonials/upload-image", {
+    const response = await fetch("/api/upload-image", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${idToken}`,
@@ -157,8 +164,8 @@ export const uploadTestimonialImage = async (
     return {
       success: true,
       url: data.url,
-      path: data.path,
-      id: data.id,
+      path: imagePath,
+      id: imageId,
     };
   } catch (error) {
     console.error("Error uploading testimonial image:", error);
