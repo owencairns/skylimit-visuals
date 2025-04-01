@@ -1,10 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { db } from '@/lib/firebase';
-import { doc, getDoc, setDoc, onSnapshot } from 'firebase/firestore';
 import TextEditModal from '@/components/TextEdit/TextEditModal';
+import { useFirebaseText } from '@/hooks/useFirebaseText';
 
 interface EditableFirebaseTextProps {
   collection: string;
@@ -24,37 +23,16 @@ export default function EditableFirebaseText({
   as = 'p'
 }: EditableFirebaseTextProps) {
   const { user } = useAuth();
-  const [text, setText] = useState<string>(defaultText);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [loading, setLoading] = useState(true);
-
-  // Subscribe to changes in the text content
-  useEffect(() => {
-    const docRef = doc(db, collection, document);
-    
-    const unsubscribe = onSnapshot(docRef, (docSnap) => {
-      if (docSnap.exists()) {
-        const data = docSnap.data();
-        if (data && data[field] !== undefined) {
-          setText(data[field]);
-        } else {
-          setText(defaultText);
-        }
-      } else {
-        setText(defaultText);
-      }
-      setLoading(false);
-    }, (error) => {
-      console.error("Error fetching text content:", error);
-      setText(defaultText);
-      setLoading(false);
-    });
-
-    return () => unsubscribe();
-  }, [collection, document, field, defaultText]);
+  
+  const { text, isLoading, updateText } = useFirebaseText({
+    collection,
+    document,
+    field,
+    defaultText,
+  });
 
   const handleTextClick = (e: React.MouseEvent) => {
-    // Stop event propagation to prevent parent links from being clicked
     e.stopPropagation();
     e.preventDefault();
     
@@ -69,34 +47,20 @@ export default function EditableFirebaseText({
 
   const handleSaveText = async (newText: string) => {
     try {
-      const docRef = doc(db, collection, document);
-      
-      // Check if document exists
-      const docSnap = await getDoc(docRef);
-      
-      if (docSnap.exists()) {
-        // Update existing document
-        await setDoc(docRef, { [field]: newText }, { merge: true });
-      } else {
-        // Create new document
-        await setDoc(docRef, { [field]: newText });
-      }
-      
-      setText(newText);
+      await updateText(newText);
       setIsModalOpen(false);
     } catch (error) {
       console.error("Error saving text:", error);
     }
   };
 
-  // Render the appropriate HTML element based on the 'as' prop
   const TextComponent = as;
 
   return (
     <>
       <div className="relative group">
         <TextComponent className={className}>
-          {loading ? (
+          {isLoading ? (
             <span className="animate-pulse bg-gray-200 rounded inline-block min-h-[1em] min-w-[10em]"></span>
           ) : (
             text

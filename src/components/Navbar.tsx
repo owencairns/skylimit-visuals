@@ -97,20 +97,22 @@ export default function Navbar() {
                 />
               </div>
               
-              {/* Logo for mobile screens */}
-              <div className="flex md:hidden ml-3 items-center">
+              {/* Logo for mobile screens - moved to center column */}
+            </div>
+            
+            {/* Center column - Logo with fade animation */}
+            <div className="flex justify-center items-center">
+              {/* Mobile logo (centered) */}
+              <div className="md:hidden">
                 <Image 
                   src="/img/logos/skylimit-oneline.svg" 
                   alt="Sky Limit Visuals" 
-                  width={160}  
-                  height={25}
+                  width={200}  
+                  height={35}
                   className={`transition-opacity duration-300 ${(!isHomePage || scrolled) ? 'opacity-100' : 'opacity-0'}`}
                 />
               </div>
-            </div>
-            
-            {/* Center column - Logo with fade animation (only on screens larger than 1400px) */}
-            <div className="flex justify-center">
+              {/* Desktop centered logo (only on screens larger than 1400px) */}
               <div className="hidden 2xl:block">
                 <Image 
                   src="/img/logos/skylimit-oneline.svg" 

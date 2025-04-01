@@ -3,7 +3,7 @@ import EditableFirebaseText from '@/components/TextEdit/EditableFirebaseText';
 
 export default function FilmsCTA() {
   return (
-    <div className="bg-stone-200 py-12 px-4 sm:px-6 lg:px-8 mt-16">
+    <div className="bg-stone-200 py-12 px-4 sm:px-6 lg:px-8 mt-16 mb-16">
       <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
         <div>
           <h2 className="text-2xl md:text-3xl font-medium mb-4">

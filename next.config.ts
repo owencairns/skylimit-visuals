@@ -7,6 +7,7 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "firebasestorage.googleapis.com",
+        pathname: "/v0/b/skylimit-visuals.firebasestorage.app/o/**",
       },
       {
         protocol: "https",
