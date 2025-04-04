@@ -162,7 +162,13 @@ export default function TestimonialEditModal({
       if (selectedFile) {
         // If this is an existing testimonial with an image, delete the old one first
         if (!testimonialToSave.isNew && testimonialToSave.imagePath) {
-          await deleteTestimonialImage(testimonialToSave);
+          const deleteResult = await deleteTestimonialImage(testimonialToSave);
+          if (!deleteResult.success) {
+            toast.dismiss(loadingToast);
+            toast.error('Failed to delete existing image. Please try again.');
+            setIsProcessing(false);
+            return;
+          }
         }
 
         const uploadResult = await uploadTestimonialImage(

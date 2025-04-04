@@ -198,7 +198,23 @@ export const deleteTestimonialImage = async (
       return { success: false };
     }
 
-    return await deleteImage(testimonial.imagePath);
+    // Get the base path without extension
+    const basePath = testimonial.imagePath.replace(/\.[^/.]+$/, "");
+
+    // Try to delete all possible formats
+    const extensions = [".jpg", ".jpeg", ".png", ".webp", ".gif"];
+    const deletionPromises = extensions.map((ext) =>
+      deleteImage(`${basePath}${ext}`).catch(() => {
+        // Ignore errors for non-existent files
+        console.log(`No ${ext} file found for ${basePath}`);
+        return { success: true };
+      })
+    );
+
+    // Wait for all deletion attempts to complete
+    await Promise.all(deletionPromises);
+
+    return { success: true };
   } catch (error) {
     console.error(
       `Error deleting image for testimonial ${testimonial.id}:`,
