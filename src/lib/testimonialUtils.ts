@@ -1,6 +1,7 @@
 import { User } from "firebase/auth";
 import { Testimonial } from "@/types/testimonial";
 import { deleteImage } from "./uploadUtils";
+import { imageUpdateEmitter } from "./uploadUtils";
 
 /**
  * Fetches all testimonials from the API
@@ -136,15 +137,18 @@ export const uploadTestimonialImage = async (
 
     // Determine file extension from the actual file
     const fileExtension = file.name.split(".").pop() || "jpg";
-    const imagePath = `/home/testimonial-${testimonialId}.${fileExtension}`;
+    // Ensure consistent image ID format for testimonials
     const imageId = `testimonial-${testimonialId}`;
+    // Ensure consistent image path format - directly under home directory
+    const imagePath = `home/${imageId}.${fileExtension}`;
 
     // Create form data
     const formData = new FormData();
     formData.append("file", file);
     formData.append("imagePath", imagePath);
     formData.append("imageId", imageId);
-    formData.append("type", "image");
+    formData.append("type", "testimonial");
+    formData.append("section", "home");
 
     // Send the request to the API
     const response = await fetch("/api/upload-image", {
@@ -160,6 +164,13 @@ export const uploadTestimonialImage = async (
     if (!response.ok) {
       throw new Error(data.error || "Failed to upload image");
     }
+
+    // Emit an event to notify all components that the image has been updated
+    imageUpdateEmitter.emit("imageUpdated", {
+      id: imageId,
+      section: "home",
+      page: "testimonials",
+    });
 
     return {
       success: true,

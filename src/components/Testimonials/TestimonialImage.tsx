@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import FirebaseImage from '@/components/FirebaseImage';
 
 interface TestimonialImageProps {
@@ -15,8 +16,15 @@ export default function TestimonialImage({
   className = '',
   isNew = false
 }: TestimonialImageProps) {
-  // For new testimonials or missing images, show a placeholder
-  if (isNew || !imageId) {
+  const [imageError, setImageError] = useState(false);
+
+  // Reset error state when imageId changes
+  useEffect(() => {
+    setImageError(false);
+  }, [imageId]);
+
+  // For new testimonials or missing imageId, show a placeholder
+  if (isNew || !imageId || imageId.trim() === '' || imageError) {
     return (
       <div className={`w-full h-full bg-gray-100 flex items-center justify-center ${className}`}>
         <div className="text-center p-4">
@@ -31,14 +39,13 @@ export default function TestimonialImage({
     );
   }
   
-  // Use FirebaseImage with a fallback for existing testimonials
+  // Use FirebaseImage for existing testimonials
   return (
     <div className={`w-full h-full ${className}`}>
       <FirebaseImage
         id={imageId}
         alt={alt}
         className="w-full h-full object-cover"
-        fallbackSrc="/images/placeholder.jpg"
       />
     </div>
   );

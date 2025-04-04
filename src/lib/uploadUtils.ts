@@ -3,6 +3,7 @@ import toast from "react-hot-toast";
 import { SiteImage } from "@/types/image";
 import { storage, ref, deleteObject } from "@/lib/firebase";
 import { EventEmitter } from "events";
+import { FirebaseError } from "firebase/app";
 
 // Create a global event emitter for image updates
 export const imageUpdateEmitter = new EventEmitter();
@@ -86,27 +87,29 @@ export const uploadImage = async (
 
 /**
  * Deletes an image from Firebase Storage
- * @param imagePath - The path of the image in Firebase Storage
- * @returns Promise with the delete result
+ * @param imagePath - Path to the image in Firebase Storage
+ * @returns Promise with the result
  */
 export const deleteImage = async (
   imagePath: string
 ): Promise<{ success: boolean }> => {
   try {
-    if (!imagePath) {
-      console.warn("No image path provided for deletion");
-      return { success: false };
-    }
-
-    // Create a reference to the file to delete
     const imageRef = ref(storage, imagePath);
-
-    // Delete the file
     await deleteObject(imageRef);
-
     return { success: true };
   } catch (error) {
-    console.error("Error deleting image:", error);
+    // Don't treat unauthorized errors as failures since they likely mean
+    // the image was already deleted or doesn't exist
+    if (
+      error instanceof FirebaseError &&
+      (error.code === "storage/unauthorized" ||
+        error.code === "storage/object-not-found")
+    ) {
+      return { success: true };
+    }
+
+    // Only log actual errors
+    console.error(`Error deleting image: ${imagePath}`, error);
     return { success: false };
   }
 };

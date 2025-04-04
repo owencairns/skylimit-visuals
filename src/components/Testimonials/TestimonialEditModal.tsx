@@ -5,7 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import Image from 'next/image';
 import toast from 'react-hot-toast';
 import { Testimonial } from '@/types/testimonial';
-import { saveTestimonial, deleteTestimonial, uploadTestimonialImage } from '@/lib/testimonialUtils';
+import { saveTestimonial, deleteTestimonial, uploadTestimonialImage, deleteTestimonialImage } from '@/lib/testimonialUtils';
 import TestimonialImage from './TestimonialImage';
 
 interface TestimonialEditModalProps {
@@ -44,7 +44,7 @@ export default function TestimonialEditModal({
       description: '',
       client: '',
       imageId: `testimonial-${newId}`,
-      imagePath: `/home/testimonial-${newId}.jpg`,
+      imagePath: `home/testimonial-${newId}.jpg`,
       imageUrl: '',
       isNew: true
     };
@@ -146,7 +146,7 @@ export default function TestimonialEditModal({
     }
     
     // Require image upload for new testimonials
-    if ((activeTab === 'add' || editedTestimonial.isNew) && !selectedFile) {
+    if (editedTestimonial.isNew && !selectedFile) {
       toast.error('Please upload an image for the new testimonial');
       return;
     }
@@ -155,49 +155,53 @@ export default function TestimonialEditModal({
       setIsProcessing(true);
       const loadingToast = toast.loading('Saving testimonial...');
       
+      // Create a copy of the testimonial to update
+      const testimonialToSave = { ...editedTestimonial };
+      
       // Upload image if selected
       if (selectedFile) {
+        // If this is an existing testimonial with an image, delete the old one first
+        if (!testimonialToSave.isNew && testimonialToSave.imagePath) {
+          await deleteTestimonialImage(testimonialToSave);
+        }
+
         const uploadResult = await uploadTestimonialImage(
           selectedFile,
-          editedTestimonial.id,
+          testimonialToSave.id,
           user
         );
         
-        if (uploadResult.success && uploadResult.path && uploadResult.url) {
-          editedTestimonial.imagePath = uploadResult.path;
-          editedTestimonial.imageUrl = uploadResult.url;
-          // Make sure the imageId is set correctly
-          editedTestimonial.imageId = uploadResult.id || `testimonial-${editedTestimonial.id}`;
-          // Remove the isNew flag after successful upload
-          if (editedTestimonial.isNew) {
-            delete editedTestimonial.isNew;
-          }
+        if (uploadResult.success && uploadResult.path && uploadResult.url && uploadResult.id) {
+          testimonialToSave.imagePath = uploadResult.path;
+          testimonialToSave.imageUrl = uploadResult.url;
+          testimonialToSave.imageId = uploadResult.id;
+          // Update the edited testimonial state to reflect the new image
+          setEditedTestimonial(testimonialToSave);
+          // Clear the selected file and preview
+          setSelectedFile(null);
+          setPreviewUrl(null);
         } else {
           toast.dismiss(loadingToast);
           toast.error('Failed to upload image. Please try again.');
           setIsProcessing(false);
           return;
         }
-      } else {
-        // Ensure we have default values for imagePath and imageUrl for existing testimonials
-        if (!editedTestimonial.imagePath) {
-          editedTestimonial.imagePath = `/home/testimonial-${editedTestimonial.id}.jpg`;
-        }
-        if (!editedTestimonial.imageUrl) {
-          editedTestimonial.imageUrl = '';
-        }
-        // Make sure the imageId is set correctly
-        if (!editedTestimonial.imageId) {
-          editedTestimonial.imageId = `testimonial-${editedTestimonial.id}`;
-        }
+      }
+      
+      // Remove isNew flag before saving
+      if (testimonialToSave.isNew) {
+        delete testimonialToSave.isNew;
       }
       
       // Save testimonial
-      const saveResult = await saveTestimonial(editedTestimonial, user);
+      const saveResult = await saveTestimonial(testimonialToSave, user);
       
       toast.dismiss(loadingToast);
       
-      if (saveResult.success) {
+      if (saveResult.success && saveResult.testimonial) {
+        // Update the selected testimonial with the saved data
+        setSelectedTestimonial(saveResult.testimonial);
+        setEditedTestimonial(saveResult.testimonial);
         toast.success('Testimonial saved successfully!');
         onSuccess();
         onClose();
@@ -473,3 +477,4 @@ export default function TestimonialEditModal({
     </div>
   );
 } 
+

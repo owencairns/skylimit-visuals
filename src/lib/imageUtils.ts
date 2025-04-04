@@ -14,7 +14,7 @@ export const fetchImageUrl = async (imagePath: string): Promise<string> => {
     const url = await getDownloadURL(imageRef);
     return url;
   } catch (error) {
-    console.error(`Error fetching image ${imagePath}:`, error);
+    // Don't log the error here since it's handled by the caller
     throw error;
   }
 };
@@ -154,70 +154,87 @@ export const fetchPageImages = async (
 export const fetchImageById = async (
   id: string
 ): Promise<SiteImage | undefined> => {
-  try {
-    // Special case for testimonial images that don't exist in siteImages
-    if (
-      id.startsWith("testimonial-") &&
-      !siteImages.find((img) => img.id === id)
-    ) {
-      // Use the testimonial-placeholder image as a fallback
-      const placeholderImage = siteImages.find(
-        (img) => img.id === "testimonial-placeholder"
-      );
-      if (placeholderImage) {
-        return {
-          ...placeholderImage,
-          id: id,
-          name: id,
-          alt: `Testimonial Image ${id.split("-")[1]}`,
-        };
+  // Special case for testimonial images (handle both singular and plural forms)
+  if (id.startsWith("testimonial-") || id.startsWith("testimonials-")) {
+    // Extract the number from the ID
+    const testimonialNumber = id.split("-")[1];
+    // Try both formats without logging intermediate failures
+    const pathFormats = [
+      `home/testimonials-${testimonialNumber}`,
+      `home/testimonial-${testimonialNumber}`,
+    ];
+    const extensions = [".jpg", ".jpeg", ".png", ".webp"];
+
+    for (const basePath of pathFormats) {
+      for (const ext of extensions) {
+        try {
+          const fullPath = basePath + ext;
+          const url = await fetchImageUrl(fullPath);
+          return {
+            id: id,
+            name: id.startsWith("testimonials-")
+              ? id
+              : `testimonials-${testimonialNumber}`,
+            path: fullPath,
+            url: url,
+            alt: `Testimonial Image ${testimonialNumber}`,
+            page: "home",
+            section: "testimonials",
+            type: "image",
+            priority: false,
+            width: 800,
+            height: 1000,
+          };
+        } catch {
+          continue;
+        }
       }
     }
 
-    // Find the image definition in our data
-    const imageDefinition = siteImages.find((image) => image.id === id);
-
-    if (!imageDefinition) {
-      console.error(`Image definition not found for ID: ${id}`);
-      return undefined;
+    // Only log one error if all attempts fail, and only in development
+    if (process.env.NODE_ENV === "development") {
+      console.warn(`Could not find image for testimonial ${id}`);
     }
-
-    console.log(
-      `Fetching image with ID: ${id}, defined path: ${imageDefinition.path}`
-    );
-
-    // Look for the file in the page directory
-    const pagePath = `/${imageDefinition.page}/`;
-    const fileInfo = await findFileByName(pagePath, id);
-
-    if (!fileInfo) {
-      // Fall back to the original path if file not found
-      console.log(
-        `File not found by name. Falling back to original path: ${imageDefinition.path}`
-      );
-      try {
-        const url = await fetchImageUrl(imageDefinition.path);
-        return { ...imageDefinition, url };
-      } catch (error) {
-        console.error(`Error fetching image with ID ${id}:`, error);
-        return imageDefinition;
-      }
-    }
-
-    console.log(`Found file for ${id}: ${fileInfo.path}`);
-
-    // Update the image definition with the found file info
-    return {
-      ...imageDefinition,
-      path: fileInfo.path,
-      url: fileInfo.url,
-      type: fileInfo.isVideo ? ("video" as const) : ("image" as const),
-      mimeType: fileInfo.isVideo ? "video/mp4" : "image/jpeg", // Default mime types
-    };
-  } catch (error) {
-    console.error(`Error fetching image with ID ${id}:`, error);
-    return siteImages.find((image) => image.id === id);
+    return undefined;
   }
+
+  // Find the image definition in our data
+  const imageDefinition = siteImages.find((image) => image.id === id);
+
+  if (!imageDefinition) {
+    if (process.env.NODE_ENV === "development") {
+      console.warn(`Image definition not found for ID: ${id}`);
+    }
+    return undefined;
+  }
+
+  if (process.env.NODE_ENV === "development") {
+    console.log(`Fetching image with ID: ${id}`);
+  }
+
+  // Look for the file in the page directory
+  const pagePath = `/${imageDefinition.page}/`;
+  const fileInfo = await findFileByName(pagePath, id);
+
+  if (!fileInfo) {
+    try {
+      const url = await fetchImageUrl(imageDefinition.path);
+      return { ...imageDefinition, url };
+    } catch (error) {
+      if (process.env.NODE_ENV === "development") {
+        console.warn(`Could not fetch image: ${id}`);
+      }
+      return imageDefinition;
+    }
+  }
+
+  return {
+    ...imageDefinition,
+    path: fileInfo.path,
+    url: fileInfo.url,
+    type: fileInfo.isVideo ? "video" : "image",
+    mimeType: fileInfo.isVideo ? "video/mp4" : "image/jpeg",
+  };
 };
 
 interface UploadResult {
