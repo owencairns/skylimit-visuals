@@ -54,8 +54,8 @@ export default function Navbar() {
   
   // Determine link size classes based on scroll position and page
   const linkSizeClasses = (!scrolled && isHomePage) 
-    ? 'text-base lg:text-lg' // Bigger when at top of home page
-    : 'text-sm lg:text-base'; // Smaller when scrolled or on other pages
+    ? 'text-base lg:text-xl' // Bigger when at top of home page
+    : 'text-lg lg:text-base'; // Smaller when scrolled or on other pages
   
   // Determine link color classes based on scroll position and page
   const linkColorClass = (!scrolled && isHomePage)
