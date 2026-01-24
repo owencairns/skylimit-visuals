@@ -3,9 +3,6 @@ import { db } from "@/lib/firebase";
 import { collection, addDoc } from "firebase/firestore";
 import { google } from "googleapis";
 
-// Gmail API setup
-const GMAIL_SCOPES = ["https://www.googleapis.com/auth/gmail.send"];
-
 const oauth2Client = new google.auth.OAuth2(
   process.env.GOOGLE_CLIENT_ID,
   process.env.GOOGLE_CLIENT_SECRET,
