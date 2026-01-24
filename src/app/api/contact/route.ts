@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import { db } from "@/lib/firebase";
 import { collection, addDoc } from "firebase/firestore";
 import { google } from "googleapis";
-import { Credentials } from "google-auth-library";
 
 // Gmail API setup
 const GMAIL_SCOPES = ["https://www.googleapis.com/auth/gmail.send"];
@@ -13,15 +12,10 @@ const oauth2Client = new google.auth.OAuth2(
   process.env.GOOGLE_REDIRECT_URI
 );
 
-// Set credentials from environment variables
-const credentials: Credentials = {
-  access_token: process.env.GOOGLE_ACCESS_TOKEN,
+// Set credentials from environment variables - use refresh_token for automatic renewal
+oauth2Client.setCredentials({
   refresh_token: process.env.GOOGLE_REFRESH_TOKEN,
-  scope: GMAIL_SCOPES[0],
-  token_type: "Bearer",
-};
-
-oauth2Client.setCredentials(credentials);
+});
 
 const gmail = google.gmail({ version: "v1", auth: oauth2Client });
 
@@ -70,7 +64,7 @@ export async function POST(request: Request) {
     }
 
     // Verify environment variables
-    if (!process.env.GOOGLE_ACCESS_TOKEN || !process.env.GOOGLE_REFRESH_TOKEN) {
+    if (!process.env.GOOGLE_REFRESH_TOKEN) {
       console.error("Missing Gmail API credentials");
       return NextResponse.json(
         { error: "Server configuration error" },

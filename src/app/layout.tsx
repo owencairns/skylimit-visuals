@@ -17,17 +17,19 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'en_US',
     url: 'https://skylimitvisuals.com',
-    title: 'Skylimit Visuals',
-    description: 'Professional Wedding Videography Services',
+    title: 'Skylimit Visuals - Professional Wedding Videography',
+    description: 'Capture your special day with cinematic wedding films. Professional wedding videography services that tell your unique love story.',
     siteName: 'Skylimit Visuals',
     images: [
       {
         url: '/img/logos/slv-logo-icon.webp',
         width: 1200,
         height: 630,
-        alt: 'Skylimit Visuals Logo',
+        alt: 'Skylimit Visuals - Wedding Videography',
+        type: 'image/webp',
       },
     ],
+    countryName: 'United States',
   },
   twitter: {
     card: 'summary_large_image',
