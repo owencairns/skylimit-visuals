@@ -1,44 +1,9 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/firebase";
 import { collection, addDoc } from "firebase/firestore";
-import { google } from "googleapis";
+import { Resend } from "resend";
 
-const oauth2Client = new google.auth.OAuth2(
-  process.env.GOOGLE_CLIENT_ID,
-  process.env.GOOGLE_CLIENT_SECRET,
-  process.env.GOOGLE_REDIRECT_URI
-);
-
-// Set credentials from environment variables - use refresh_token for automatic renewal
-oauth2Client.setCredentials({
-  refresh_token: process.env.GOOGLE_REFRESH_TOKEN,
-});
-
-const gmail = google.gmail({ version: "v1", auth: oauth2Client });
-
-function createEmail(
-  to: string,
-  from: string,
-  subject: string,
-  message: string
-) {
-  const emailLines = [
-    `From: ${from}`,
-    `To: ${to}`,
-    "Content-Type: text/html; charset=utf-8",
-    "MIME-Version: 1.0",
-    `Subject: ${subject}`,
-    "",
-    message,
-  ];
-
-  const email = emailLines.join("\r\n");
-  return Buffer.from(email)
-    .toString("base64")
-    .replace(/\+/g, "-")
-    .replace(/\//g, "_")
-    .replace(/=+$/, "");
-}
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function POST(request: Request) {
   try {
@@ -61,8 +26,8 @@ export async function POST(request: Request) {
     }
 
     // Verify environment variables
-    if (!process.env.GOOGLE_REFRESH_TOKEN) {
-      console.error("Missing Gmail API credentials");
+    if (!process.env.RESEND_API_KEY) {
+      console.error("Missing Resend API key");
       return NextResponse.json(
         { error: "Server configuration error" },
         { status: 500 }
@@ -103,30 +68,25 @@ export async function POST(request: Request) {
     console.log("Sending email notification...");
 
     try {
-      // Create the email
-      const encodedEmail = createEmail(
-        "skylimitvisuals@gmail.com", // Changed recipient
-        "owencairns15@gmail.com", // Use the submitter's email as the From address
-        `New Contact Form Submission from ${name}`,
-        emailHtml
-      );
-
-      // Send the email
-      const response = await gmail.users.messages.send({
-        userId: "me",
-        requestBody: {
-          raw: encodedEmail,
-        },
+      const { error } = await resend.emails.send({
+        from: "Sky Limit Visuals <contact@skylimitvisuals.com>",
+        to: "skylimitvisuals@gmail.com",
+        replyTo: email,
+        subject: `New Contact Form Submission from ${name}`,
+        html: emailHtml,
       });
 
-      console.log("Email sent successfully", response.data);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (emailError: any) {
-      console.error("Gmail API error:", {
-        message: emailError.message,
-        code: emailError.code,
-        errors: emailError.errors,
-      });
+      if (error) {
+        console.error("Resend error:", error);
+        return NextResponse.json(
+          { error: "Failed to send email notification" },
+          { status: 500 }
+        );
+      }
+
+      console.log("Email sent successfully");
+    } catch (emailError) {
+      console.error("Email error:", emailError);
       return NextResponse.json(
         { error: "Failed to send email notification" },
         { status: 500 }
