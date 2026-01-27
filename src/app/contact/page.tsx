@@ -1,10 +1,12 @@
 "use client";
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { FiPhone, FiMail, FiCalendar, FiUser, FiMessageSquare } from 'react-icons/fi';
 import { InlineWidget } from 'react-calendly';
 
 export default function ContactPage() {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -14,7 +16,6 @@ export default function ContactPage() {
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitSuccess, setSubmitSuccess] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -43,19 +44,8 @@ export default function ContactPage() {
         throw new Error(data.error || 'Failed to submit form');
       }
 
-      setSubmitSuccess(true);
-      
-      // Reset form after 3 seconds
-      setTimeout(() => {
-        setSubmitSuccess(false);
-        setFormData({
-          name: '',
-          email: '',
-          service: '',
-          date: '',
-          message: ''
-        });
-      }, 3000);
+      sessionStorage.setItem('contactFormSubmitted', 'true');
+      router.push('/thank-you');
     } catch (error) {
       console.error('Error submitting form:', error);
       alert('Failed to submit form. Please try again.');
@@ -122,14 +112,7 @@ export default function ContactPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
           {/* Contact Form */}
           <div className="bg-white p-8 rounded-xl shadow-lg border border-gray-100">
-            {submitSuccess ? (
-              <div className="text-center py-12">
-                <div className="text-green-500 text-5xl mb-4">✓</div>
-                <h3 className="text-2xl font-serif text-brand-blue mb-2">Thank You!</h3>
-                <p className="text-brand-blue/70">Your message has been sent successfully. We&apos;ll be in touch soon!</p>
-              </div>
-            ) : (
-              <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
                   <label htmlFor="name" className="block text-sm font-medium text-brand-blue/80 mb-1">
                     Your Name
@@ -253,7 +236,6 @@ export default function ContactPage() {
                   {isSubmitting ? 'Sending...' : 'Send Message'}
                 </button>
               </form>
-            )}
           </div>
           
           {/* Contact Information */}
