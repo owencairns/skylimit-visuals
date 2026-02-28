@@ -45,7 +45,7 @@ export default function ContactPage() {
   return (
     <main className="min-h-screen bg-gradient-to-b from-white to-stone-50">
       <Script
-        src="https://js-na2.hs-scripts.com/243672196.js"
+        src="https://js-na2.hsforms.net/forms/embed/v2.js"
         strategy="afterInteractive"
         onLoad={createForm}
       />
