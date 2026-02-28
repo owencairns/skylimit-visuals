@@ -1,36 +1,53 @@
 "use client";
 
 import { useEffect, useRef } from 'react';
-import { useRouter } from 'next/navigation';
 import { FiPhone, FiMail } from 'react-icons/fi';
 import { InlineWidget } from 'react-calendly';
 import Script from 'next/script';
 
+declare global {
+  interface Window {
+    hbspt?: {
+      forms: {
+        create: (config: Record<string, unknown>) => void;
+      };
+    };
+  }
+}
+
 export default function ContactPage() {
-  const router = useRouter();
   const formContainerRef = useRef<HTMLDivElement>(null);
+  const formCreated = useRef(false);
+
+  const createForm = () => {
+    if (formCreated.current || !window.hbspt || !formContainerRef.current) return;
+    formCreated.current = true;
+
+    window.hbspt.forms.create({
+      region: 'na2',
+      portalId: '243672196',
+      formId: '115f7d3d-7a34-4afc-adca-15d39582ea0d',
+      target: '#hubspot-form-container',
+      onFormSubmitted: () => {
+        sessionStorage.setItem('contactFormSubmitted', 'true');
+        window.location.href = '/thank-you';
+      },
+    });
+  };
 
   useEffect(() => {
-    // Listen for HubSpot form submission to redirect to thank-you page
-    const handleMessage = (event: MessageEvent) => {
-      if (
-        event.data?.type === 'hsFormCallback' &&
-        event.data?.eventName === 'onFormSubmitted'
-      ) {
-        sessionStorage.setItem('contactFormSubmitted', 'true');
-        router.push('/thank-you');
-      }
-    };
-
-    window.addEventListener('message', handleMessage);
-    return () => window.removeEventListener('message', handleMessage);
-  }, [router]);
+    // If script already loaded, create form immediately
+    if (window.hbspt) {
+      createForm();
+    }
+  }, []);
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-white to-stone-50">
       <Script
-        src="https://js-na2.hsforms.net/forms/embed/243672196.js"
+        src="https://js-na2.hs-scripts.com/243672196.js"
         strategy="afterInteractive"
+        onLoad={createForm}
       />
 
       <div className="max-w-7xl mx-auto pt-32 pb-16 px-4 sm:px-6 lg:px-8">
@@ -88,10 +105,7 @@ export default function ContactPage() {
             <h2 className="text-2xl font-serif text-brand-blue mb-6">Send Us a Message</h2>
             <div
               ref={formContainerRef}
-              className="hs-form-frame"
-              data-region="na2"
-              data-form-id="115f7d3d-7a34-4afc-adca-15d39582ea0d"
-              data-portal-id="243672196"
+              id="hubspot-form-container"
             />
           </div>
 
