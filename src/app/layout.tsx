@@ -61,6 +61,76 @@ export default function RootLayout({
             gtag('config', 'AW-17901774533');
           `}
         </Script>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "LocalBusiness",
+              name: "Skylimit Visuals",
+              description:
+                "Professional wedding videography and photography services in Michigan. Cinematic wedding films and stunning photography that tell your unique love story.",
+              url: "https://skylimitvisuals.com",
+              logo: "https://skylimitvisuals.com/img/logos/slv-logo-icon.webp",
+              image: "https://skylimitvisuals.com/img/logos/slv-logo-icon.webp",
+              telephone: "616-805-9578",
+              email: "skylimitvisuals@gmail.com",
+              address: {
+                "@type": "PostalAddress",
+                addressRegion: "MI",
+                addressCountry: "US",
+              },
+              areaServed: {
+                "@type": "State",
+                name: "Michigan",
+              },
+              sameAs: [
+                "https://www.facebook.com/Skylimitvisuals/",
+                "https://www.instagram.com/skylimitvisuals/",
+                "https://www.youtube.com/@skylimitvisuals",
+              ],
+              priceRange: "$$",
+              openingHoursSpecification: {
+                "@type": "OpeningHoursSpecification",
+                dayOfWeek: [
+                  "Monday",
+                  "Tuesday",
+                  "Wednesday",
+                  "Thursday",
+                  "Friday",
+                  "Saturday",
+                  "Sunday",
+                ],
+                opens: "09:00",
+                closes: "18:00",
+              },
+              hasOfferCatalog: {
+                "@type": "OfferCatalog",
+                name: "Wedding Services",
+                itemListElement: [
+                  {
+                    "@type": "Offer",
+                    itemOffered: {
+                      "@type": "Service",
+                      name: "Wedding Videography",
+                      description:
+                        "Cinematic wedding films with authentic storytelling and timeless style.",
+                    },
+                  },
+                  {
+                    "@type": "Offer",
+                    itemOffered: {
+                      "@type": "Service",
+                      name: "Wedding Photography",
+                      description:
+                        "Stunning wedding photography capturing the most beautiful moments of your special day.",
+                    },
+                  },
+                ],
+              },
+            }),
+          }}
+        />
       </head>
       <body>
         <QueryProvider>

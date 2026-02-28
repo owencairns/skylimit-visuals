@@ -1,0 +1,10 @@
+# Skylimit Visuals - robots.txt
+User-agent: *
+Allow: /
+
+Disallow: /admin
+Disallow: /login
+Disallow: /thank-you
+Disallow: /api/
+
+Sitemap: https://skylimitvisuals.com/sitemap.xml

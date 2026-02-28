@@ -8,6 +8,7 @@ import FilmCard from './components/FilmCard';
 import FilmsCTA from './components/FilmsCTA';
 import FilmEditModal from './components/FilmEditModal';
 import { FilmStory } from './components/FilmCard';
+import EditableFirebaseText from '@/components/TextEdit/EditableFirebaseText';
 
 export default function FilmsPage() {
   const { user } = useAuth();
@@ -55,8 +56,15 @@ export default function FilmsPage() {
   return (
     <main>
       <div className="text-center pt-32 pb-16">
-        <h1 className="text-4xl md:text-5xl font-serif text-brand-blue mb-2">SELECTED STORIES</h1>
-        <div className="w-24 h-px bg-brand-blue/30 mx-auto"></div>
+        <h1 className="text-4xl md:text-5xl font-serif text-brand-blue mb-2">Wedding Videography</h1>
+        <div className="w-24 h-px bg-brand-blue/30 mx-auto mb-6"></div>
+        <EditableFirebaseText
+          collection="text-content"
+          document="films"
+          field="gallery-description"
+          defaultText="Explore our wedding videography portfolio. We craft cinematic wedding videos with authentic storytelling and timeless style, preserving every meaningful moment. If you are looking for a Michigan wedding videographer who values quality and authentic storytelling, we would be honored to capture your wedding day."
+          className="text-lg md:text-xl text-brand-blue/80 max-w-2xl mx-auto px-4"
+        />
       </div>
       
       <div 

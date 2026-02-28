@@ -71,7 +71,7 @@ export default function InvestmentPage() {
           <div className="absolute inset-0 bg-black/50 z-0"></div>
         </div>
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center py-32">
-          <h1 className="text-4xl md:text-6xl font-serif mb-4">INVESTMENT</h1>
+          <h1 className="text-4xl md:text-6xl font-serif mb-4">Wedding Photography & Videography Pricing</h1>
           <EditableFirebaseText
             collection="text-content"
             document="investment"

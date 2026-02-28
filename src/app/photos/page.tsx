@@ -75,7 +75,7 @@ const PhotoItem = ({ photo, index, columnIndex }: { photo: Photo; index: number;
         <div className="relative overflow-hidden rounded-sm shadow-lg transition-shadow duration-300 group-hover:shadow-xl">
           <Image
             src={photo.imageUrl}
-            alt=""
+            alt={photo.title || "Wedding photography by Skylimit Visuals"}
             width={800}
             height={800}
             className="w-full h-auto"
@@ -143,7 +143,7 @@ export default function PhotosPage() {
       onMouseLeave={() => setShowEditButton(false)}
     >
       <div className="text-center pt-32 pb-16">
-        <h1 className="text-4xl md:text-5xl font-serif text-brand-blue mb-2">PHOTO GALLERY</h1>
+        <h1 className="text-4xl md:text-5xl font-serif text-brand-blue mb-2">Wedding Photography</h1>
         <div className="w-24 h-px bg-brand-blue/30 mx-auto mb-6"></div>
         <EditableFirebaseText
           collection="text-content"
