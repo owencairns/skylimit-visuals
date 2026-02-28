@@ -8,7 +8,7 @@ export const metadata: Metadata = {
     title: "Wedding Photography | Skylimit Visuals",
     description:
       "Browse our collection of stunning wedding photography, capturing the most beautiful moments of your special day.",
-    url: "https://skylimitvisuals.com/photos",
+    url: "https://skylimitvisuals.com/wedding-photography",
   },
 };
 

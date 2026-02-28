@@ -54,7 +54,7 @@ export default function ThankYouPage() {
               Back to Home
             </Link>
             <Link
-              href="/films"
+              href="/wedding-videography"
               className="inline-flex items-center justify-center px-6 py-3 bg-brand-blue text-white rounded-lg hover:bg-brand-blue/90 transition-colors duration-200"
             >
               View Our Films

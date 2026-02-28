@@ -7,7 +7,7 @@ import {
 } from "firebase/storage";
 import { doc, setDoc, deleteDoc } from "firebase/firestore";
 import { storage, db } from "@/lib/firebase";
-import { FilmStory } from "@/app/films/components/FilmCard";
+import { FilmStory } from "@/app/wedding-videography/components/FilmCard";
 
 export async function saveFilm(film: FilmStory, user: User) {
   try {

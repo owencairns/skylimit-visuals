@@ -76,22 +76,22 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                     Home
                   </Link>
                   <Link
-                    href="/films"
-                    className={`block py-2 text-lg ${pathname === '/films' ? 'text-secondary' : 'text-white hover:text-secondary'} transition-colors`}
+                    href="/wedding-videography"
+                    className={`block py-2 text-lg ${pathname === '/wedding-videography' ? 'text-secondary' : 'text-white hover:text-secondary'} transition-colors`}
                     onClick={onClose}
                   >
                     Films
                   </Link>
                   <Link
-                    href="/photos"
-                    className={`block py-2 text-lg ${pathname === '/photos' ? 'text-secondary' : 'text-white hover:text-secondary'} transition-colors`}
+                    href="/wedding-photography"
+                    className={`block py-2 text-lg ${pathname === '/wedding-photography' ? 'text-secondary' : 'text-white hover:text-secondary'} transition-colors`}
                     onClick={onClose}
                   >
                     Photos
                   </Link>
                   <Link
-                    href="/investment"
-                    className={`block py-2 text-lg ${pathname === '/investment' ? 'text-secondary' : 'text-white hover:text-secondary'} transition-colors`}
+                    href="/wedding-photography-videography-pricing"
+                    className={`block py-2 text-lg ${pathname === '/wedding-photography-videography-pricing' ? 'text-secondary' : 'text-white hover:text-secondary'} transition-colors`}
                     onClick={onClose}
                   >
                     Investment

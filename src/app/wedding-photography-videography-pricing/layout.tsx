@@ -8,7 +8,7 @@ export const metadata: Metadata = {
     title: "Wedding Photography & Videography Pricing | Skylimit Visuals",
     description:
       "Wedding photography and videography pricing packages. Choose from carefully crafted packages designed to capture your special moments.",
-    url: "https://skylimitvisuals.com/investment",
+    url: "https://skylimitvisuals.com/wedding-photography-videography-pricing",
   },
 };
 

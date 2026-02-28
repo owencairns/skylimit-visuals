@@ -133,20 +133,20 @@ export default function Navbar() {
                 Home
               </Link>
               <Link 
-                href="/films" 
-                className={`${pathname === '/films' ? 'text-secondary' : linkColorClass || 'text-white'} hover:text-secondary transition-all duration-300 whitespace-nowrap ${linkSizeClasses}`}
+                href="/wedding-videography"
+                className={`${pathname === '/wedding-videography' ? 'text-secondary' : linkColorClass || 'text-white'} hover:text-secondary transition-all duration-300 whitespace-nowrap ${linkSizeClasses}`}
               >
                 Films
               </Link>
-              <Link 
-                href="/photos" 
-                className={`${pathname === '/photos' ? 'text-secondary' : linkColorClass || 'text-white'} hover:text-secondary transition-all duration-300 whitespace-nowrap ${linkSizeClasses}`}
+              <Link
+                href="/wedding-photography"
+                className={`${pathname === '/wedding-photography' ? 'text-secondary' : linkColorClass || 'text-white'} hover:text-secondary transition-all duration-300 whitespace-nowrap ${linkSizeClasses}`}
               >
                 Photos
               </Link>
-              <Link 
-                href="/investment" 
-                className={`${pathname === '/investment' ? 'text-secondary' : linkColorClass || 'text-white'} hover:text-secondary transition-all duration-300 whitespace-nowrap ${linkSizeClasses}`}
+              <Link
+                href="/wedding-photography-videography-pricing"
+                className={`${pathname === '/wedding-photography-videography-pricing' ? 'text-secondary' : linkColorClass || 'text-white'} hover:text-secondary transition-all duration-300 whitespace-nowrap ${linkSizeClasses}`}
               >
                 Investment
               </Link>

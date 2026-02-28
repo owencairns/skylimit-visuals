@@ -96,7 +96,7 @@ export default function Home() {
               <div className="absolute inset-0 flex flex-col items-center justify-center text-white">
                 <h3 className="text-5xl font-serif mb-4">Films</h3>
                 <p className="text-xl uppercase tracking-widest">BROWSE</p>
-                <Link href="/films" className="absolute inset-0 z-10">
+                <Link href="/wedding-videography" className="absolute inset-0 z-10">
                   <span className="sr-only">View Films</span>
                 </Link>
               </div>
@@ -116,7 +116,7 @@ export default function Home() {
               <div className="absolute inset-0 flex flex-col items-center justify-center text-white">
                 <h3 className="text-5xl font-serif mb-4">Investment</h3>
                 <p className="text-xl uppercase tracking-widest">EXPLORE</p>
-                <Link href="/investment" className="absolute inset-0 z-10">
+                <Link href="/wedding-photography-videography-pricing" className="absolute inset-0 z-10">
                   <span className="sr-only">View Investment Options</span>
                 </Link>
               </div>

@@ -13,7 +13,7 @@ import {
   query,
   where,
 } from "firebase/firestore";
-import { Photo } from "@/app/photos/types/Photo";
+import { Photo } from "@/app/wedding-photography/types/Photo";
 
 // Upload a photo to Firebase Storage
 export const uploadPhoto = async (

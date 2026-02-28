@@ -1,7 +1,25 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  async redirects() {
+    return [
+      {
+        source: '/films',
+        destination: '/wedding-videography',
+        permanent: true,
+      },
+      {
+        source: '/photos',
+        destination: '/wedding-photography',
+        permanent: true,
+      },
+      {
+        source: '/investment',
+        destination: '/wedding-photography-videography-pricing',
+        permanent: true,
+      },
+    ];
+  },
   images: {
     remotePatterns: [
       {
