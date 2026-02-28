@@ -28,9 +28,9 @@ export default function ContactPage() {
       portalId: '243672196',
       formId: '115f7d3d-7a34-4afc-adca-15d39582ea0d',
       target: '#hubspot-form-container',
-      onFormSubmitted: () => {
+      redirectUrl: 'https://skylimitvisuals.com/thank-you',
+      onFormSubmit: () => {
         sessionStorage.setItem('contactFormSubmitted', 'true');
-        window.location.href = '/thank-you';
       },
     });
   };
