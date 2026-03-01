@@ -5,6 +5,9 @@ import { Resend } from "resend";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
+const HUBSPOT_PORTAL_ID = "243672196";
+const HUBSPOT_FORM_ID = "115f7d3d-7a34-4afc-adca-15d39582ea0d";
+
 export async function POST(request: Request) {
   try {
     const data = await request.json();
@@ -25,17 +28,40 @@ export async function POST(request: Request) {
       );
     }
 
-    // Verify environment variables
-    if (!process.env.RESEND_API_KEY) {
-      console.error("Missing Resend API key");
-      return NextResponse.json(
-        { error: "Server configuration error" },
-        { status: 500 }
+    // Submit to HubSpot Forms API
+    try {
+      const hubspotResponse = await fetch(
+        `https://api.hsforms.com/submissions/v3/integration/submit/${HUBSPOT_PORTAL_ID}/${HUBSPOT_FORM_ID}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            fields: [
+              { objectTypeId: "0-1", name: "firstname", value: name },
+              { objectTypeId: "0-1", name: "email", value: email },
+              { objectTypeId: "0-1", name: "message", value: `Service: ${service}\nEvent Date: ${date || "Not specified"}\n\n${message}` },
+            ],
+            context: {
+              pageUri: "https://skylimitvisuals.com/contact",
+              pageName: "Contact Us",
+            },
+          }),
+        }
       );
+
+      if (!hubspotResponse.ok) {
+        const hubspotError = await hubspotResponse.text();
+        console.error("HubSpot submission error:", hubspotError);
+      } else {
+        console.log("Successfully submitted to HubSpot");
+      }
+    } catch (hubspotError) {
+      console.error("HubSpot submission error:", hubspotError);
+      // Continue with Firebase/email even if HubSpot fails
     }
 
+    // Store in Firebase
     try {
-      // Store in Firebase
       const contactRef = collection(db, "contact-submissions");
       const submission = {
         name,
@@ -54,43 +80,35 @@ export async function POST(request: Request) {
       // Continue with email even if Firebase fails
     }
 
-    // Create email content
-    const emailHtml = `
-      <h2>New Contact Form Submission</h2>
-      <p><strong>Name:</strong> ${name}</p>
-      <p><strong>Email:</strong> ${email}</p>
-      <p><strong>Service:</strong> ${service}</p>
-      <p><strong>Event Date:</strong> ${date || "Not specified"}</p>
-      <p><strong>Message:</strong></p>
-      <p>${message.replace(/\n/g, "<br>")}</p>
-    `;
+    // Send email notification via Resend
+    if (process.env.RESEND_API_KEY) {
+      const emailHtml = `
+        <h2>New Contact Form Submission</h2>
+        <p><strong>Name:</strong> ${name}</p>
+        <p><strong>Email:</strong> ${email}</p>
+        <p><strong>Service:</strong> ${service}</p>
+        <p><strong>Event Date:</strong> ${date || "Not specified"}</p>
+        <p><strong>Message:</strong></p>
+        <p>${message.replace(/\n/g, "<br>")}</p>
+      `;
 
-    console.log("Sending email notification...");
+      try {
+        const { error } = await resend.emails.send({
+          from: "Sky Limit Visuals <contact@skylimitvisuals.com>",
+          to: "skylimitvisuals@gmail.com",
+          replyTo: email,
+          subject: `New Contact Form Submission from ${name}`,
+          html: emailHtml,
+        });
 
-    try {
-      const { error } = await resend.emails.send({
-        from: "Sky Limit Visuals <contact@skylimitvisuals.com>",
-        to: "skylimitvisuals@gmail.com",
-        replyTo: email,
-        subject: `New Contact Form Submission from ${name}`,
-        html: emailHtml,
-      });
-
-      if (error) {
-        console.error("Resend error:", error);
-        return NextResponse.json(
-          { error: "Failed to send email notification" },
-          { status: 500 }
-        );
+        if (error) {
+          console.error("Resend error:", error);
+        } else {
+          console.log("Email sent successfully");
+        }
+      } catch (emailError) {
+        console.error("Email error:", emailError);
       }
-
-      console.log("Email sent successfully");
-    } catch (emailError) {
-      console.error("Email error:", emailError);
-      return NextResponse.json(
-        { error: "Failed to send email notification" },
-        { status: 500 }
-      );
     }
 
     return NextResponse.json({ success: true });

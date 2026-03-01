@@ -220,7 +220,7 @@ export const fetchImageById = async (
     try {
       const url = await fetchImageUrl(imageDefinition.path);
       return { ...imageDefinition, url };
-    } catch (error) {
+    } catch {
       if (process.env.NODE_ENV === "development") {
         console.warn(`Could not fetch image: ${id}`);
       }
