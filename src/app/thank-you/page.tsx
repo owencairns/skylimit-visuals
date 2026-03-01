@@ -1,28 +1,7 @@
-'use client';
-
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { FiCheckCircle, FiArrowLeft } from 'react-icons/fi';
 
 export default function ThankYouPage() {
-  const router = useRouter();
-  const [isAuthorized, setIsAuthorized] = useState(false);
-
-  useEffect(() => {
-    const submitted = sessionStorage.getItem('contactFormSubmitted');
-    if (submitted) {
-      sessionStorage.removeItem('contactFormSubmitted');
-      setIsAuthorized(true);
-    } else {
-      router.replace('/contact');
-    }
-  }, [router]);
-
-  if (!isAuthorized) {
-    return null;
-  }
-
   return (
     <main className="min-h-screen bg-gradient-to-b from-white to-stone-50">
       <div className="max-w-3xl mx-auto pt-32 pb-16 px-4 sm:px-6 lg:px-8">
