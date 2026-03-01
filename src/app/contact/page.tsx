@@ -1,61 +1,53 @@
 "use client";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { FiPhone, FiMail, FiCalendar, FiUser, FiMessageSquare } from 'react-icons/fi';
+import { useEffect, useRef } from 'react';
+import { FiPhone, FiMail } from 'react-icons/fi';
 import { InlineWidget } from 'react-calendly';
+import Script from 'next/script';
+
+declare global {
+  interface Window {
+    hbspt?: {
+      forms: {
+        create: (config: Record<string, unknown>) => void;
+      };
+    };
+  }
+}
 
 export default function ContactPage() {
-  const router = useRouter();
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    service: '',
-    date: '',
-    message: ''
-  });
+  const formContainerRef = useRef<HTMLDivElement>(null);
+  const formCreated = useRef(false);
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const createForm = () => {
+    if (formCreated.current || !window.hbspt || !formContainerRef.current) return;
+    formCreated.current = true;
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    window.hbspt.forms.create({
+      region: 'na2',
+      portalId: '243672196',
+      formId: '115f7d3d-7a34-4afc-adca-15d39582ea0d',
+      target: '#hubspot-form-container',
+      onFormSubmit: () => {
+        sessionStorage.setItem('contactFormSubmitted', 'true');
+      },
+    });
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-
-    try {
-      const response = await fetch('/api/contact', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to submit form');
-      }
-
-      sessionStorage.setItem('contactFormSubmitted', 'true');
-      router.push('/thank-you');
-    } catch (error) {
-      console.error('Error submitting form:', error);
-      alert('Failed to submit form. Please try again.');
-    } finally {
-      setIsSubmitting(false);
+  useEffect(() => {
+    if (window.hbspt) {
+      createForm();
     }
-  };
+  }, []);
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-white to-stone-50">
+      <Script
+        src="https://js-na2.hsforms.net/forms/embed/v2.js"
+        strategy="afterInteractive"
+        onLoad={createForm}
+      />
+
       <div className="max-w-7xl mx-auto pt-32 pb-16 px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <h1 className="text-4xl md:text-5xl font-serif text-brand-blue mb-4">Get In Touch</h1>
@@ -80,10 +72,6 @@ export default function ContactPage() {
                 styles={{
                   height: '600px',
                   width: '100%',
-                }}
-                prefill={{
-                  email: formData.email,
-                  name: formData.name,
                 }}
                 pageSettings={{
                   backgroundColor: 'ffffff',
@@ -110,132 +98,13 @@ export default function ContactPage() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
-          {/* Contact Form */}
+          {/* HubSpot Contact Form */}
           <div className="bg-white p-8 rounded-xl shadow-lg border border-gray-100">
-            <form onSubmit={handleSubmit} className="space-y-6">
-                <div>
-                  <label htmlFor="name" className="block text-sm font-medium text-brand-blue/80 mb-1">
-                    Your Name
-                  </label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <FiUser className="h-5 w-5 text-brand-blue/50" />
-                    </div>
-                    <input
-                      type="text"
-                      id="name"
-                      name="name"
-                      value={formData.name}
-                      onChange={handleChange}
-                      required
-                      className="block w-full pl-10 pr-3 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-blue/30 focus:border-transparent"
-                      placeholder="John & Jane Doe"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-brand-blue/80 mb-1">
-                    Email Address
-                  </label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <FiMail className="h-5 w-5 text-brand-blue/50" />
-                    </div>
-                    <input
-                      type="email"
-                      id="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleChange}
-                      required
-                      className="block w-full pl-10 pr-3 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-blue/30 focus:border-transparent"
-                      placeholder="your@email.com"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label htmlFor="service" className="block text-sm font-medium text-brand-blue/80 mb-1">
-                    Service Interested In
-                  </label>
-                  <div className="relative">
-                    <select
-                      id="service"
-                      name="service"
-                      value={formData.service}
-                      onChange={handleChange}
-                      required
-                      className="block w-full pl-3 pr-10 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-blue/30 focus:border-transparent appearance-none bg-white"
-                    >
-                      <option value="" disabled>Select a service</option>
-                      <option value="Wedding Film">Wedding Film</option>
-                      <option value="Engagement Session">Engagement Session</option>
-                      <option value="Elopement">Elopement</option>
-                      <option value="Other">Other</option>
-                    </select>
-                    <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                      <svg className="h-5 w-5 text-brand-blue/50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                        <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-                      </svg>
-                    </div>
-                  </div>
-                </div>
-
-                <div>
-                  <label htmlFor="date" className="block text-sm font-medium text-brand-blue/80 mb-1">
-                    Event Date
-                  </label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <FiCalendar className="h-5 w-5 text-brand-blue/50" />
-                    </div>
-                    <input
-                      type="date"
-                      id="date"
-                      name="date"
-                      value={formData.date}
-                      onChange={handleChange}
-                      className="block w-full pl-10 pr-3 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-blue/30 focus:border-transparent"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label htmlFor="message" className="block text-sm font-medium text-brand-blue/80 mb-1">
-                    Your Message
-                  </label>
-                  <div className="relative">
-                    <div className="absolute top-3 left-3 flex items-start pointer-events-none">
-                      <FiMessageSquare className="h-5 w-5 text-brand-blue/50" />
-                    </div>
-                    <textarea
-                      id="message"
-                      name="message"
-                      value={formData.message}
-                      onChange={handleChange}
-                      required
-                      rows={5}
-                      className="block w-full pl-10 pr-3 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-blue/30 focus:border-transparent"
-                      placeholder="Tell us about your special day..."
-                    ></textarea>
-                  </div>
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="w-full py-3 px-4 border border-transparent rounded-lg shadow-sm text-white bg-brand-blue hover:bg-brand-blue/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-blue transition-colors duration-200 ease-in-out flex justify-center"
-                >
-                  {isSubmitting ? (
-                    <svg className="animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                  ) : null}
-                  {isSubmitting ? 'Sending...' : 'Send Message'}
-                </button>
-              </form>
+            <h2 className="text-2xl font-serif text-brand-blue mb-6">Send Us a Message</h2>
+            <div
+              ref={formContainerRef}
+              id="hubspot-form-container"
+            />
           </div>
 
           {/* Contact Information */}
