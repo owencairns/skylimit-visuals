@@ -131,10 +131,10 @@ export default function InvestmentPage() {
 
         {/* Spring Sale Banner (videography only) */}
         {activeType === 'videography' && (
-          <div className="mb-10 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-500 text-white px-6 py-5 text-center shadow-lg">
-            <p className="text-sm font-bold uppercase tracking-widest mb-1">🌸 Spring Sale 🌸</p>
+          <div className="mb-10 rounded-xl bg-brand-gold text-brand-blue px-6 py-5 text-center shadow-lg">
+            <p className="text-sm font-bold uppercase tracking-widest mb-1">Spring Sale</p>
             <p className="text-2xl md:text-3xl font-serif">Save $300 on All Videography Packages</p>
-            <p className="text-white/80 text-sm mt-1">Limited time offer</p>
+            <p className="text-brand-blue/60 text-sm mt-1">Limited time offer</p>
           </div>
         )}
 
