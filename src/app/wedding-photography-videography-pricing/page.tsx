@@ -129,6 +129,15 @@ export default function InvestmentPage() {
           </button>
         )}
 
+        {/* Spring Sale Banner (videography only) */}
+        {activeType === 'videography' && (
+          <div className="mb-10 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-500 text-white px-6 py-5 text-center shadow-lg">
+            <p className="text-sm font-bold uppercase tracking-widest mb-1">🌸 Spring Sale 🌸</p>
+            <p className="text-2xl md:text-3xl font-serif">Save $300 on All Videography Packages</p>
+            <p className="text-white/80 text-sm mt-1">Limited time offer</p>
+          </div>
+        )}
+
         {/* Section Title */}
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-serif text-brand-blue mb-4">
@@ -154,6 +163,7 @@ export default function InvestmentPage() {
               <PackageCard
                 key={pkg.id}
                 package={pkg}
+                saleDiscount={activeType === 'videography' ? 300 : undefined}
               />
             ))}
           </div>
