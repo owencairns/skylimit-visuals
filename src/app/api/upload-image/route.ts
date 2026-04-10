@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getStorage } from "firebase-admin/storage";
-import { adminApp } from "@/lib/firebase-admin";
+import { getAdminApp } from "@/lib/firebase-admin";
 
 export async function POST(request: NextRequest) {
   try {
@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
     const buffer = Buffer.from(fileData);
 
     // Get storage instance
-    const storage = getStorage(adminApp);
+    const storage = getStorage(getAdminApp());
     const bucket = storage.bucket();
 
     // Upload the file

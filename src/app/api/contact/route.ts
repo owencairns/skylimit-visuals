@@ -3,8 +3,6 @@ import { db } from "@/lib/firebase";
 import { collection, addDoc } from "firebase/firestore";
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 const HUBSPOT_PORTAL_ID = "243672196";
 const HUBSPOT_FORM_ID = "115f7d3d-7a34-4afc-adca-15d39582ea0d";
 
@@ -81,7 +79,8 @@ export async function POST(request: Request) {
     }
 
     // Send email notification via Resend
-    if (process.env.RESEND_API_KEY) {
+    const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
+    if (resend) {
       const emailHtml = `
         <h2>New Contact Form Submission</h2>
         <p><strong>Name:</strong> ${name}</p>
