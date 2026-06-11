@@ -4,29 +4,13 @@ import { Package } from '@/types/package';
 
 interface PackageCardProps {
   package: Package;
-  saleDiscount?: number;
 }
 
-function formatSalePrice(price: string, discount: number): string | null {
-  const numeric = Number(price.replace(/[^0-9.]/g, ''));
-  if (isNaN(numeric) || numeric <= discount) return null;
-  const newPrice = numeric - discount;
-  return '$' + newPrice.toLocaleString('en-US');
-}
-
-export default function PackageCard({ package: pkg, saleDiscount }: PackageCardProps) {
+export default function PackageCard({ package: pkg }: PackageCardProps) {
   const { title, subtitle, description, imageUrl, price, features } = pkg;
-  const salePrice = saleDiscount ? formatSalePrice(price, saleDiscount) : null;
 
   return (
     <div className="group relative flex flex-col bg-white rounded-xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-1">
-      {/* Sale Badge */}
-      {salePrice && (
-        <div className="absolute top-4 right-4 z-10 bg-emerald-600 text-white text-xs font-bold uppercase tracking-wider px-3 py-1.5 rounded-full shadow-md">
-          Spring Sale
-        </div>
-      )}
-
       {/* Image */}
       <div className="relative w-full aspect-[4/3] overflow-hidden">
         <Image
@@ -46,14 +30,7 @@ export default function PackageCard({ package: pkg, saleDiscount }: PackageCardP
           {subtitle && (
             <p className="text-sm uppercase tracking-wider text-gray-500 mt-1">{subtitle}</p>
           )}
-          {salePrice ? (
-            <div className="mt-2 flex items-center gap-3">
-              <span className="text-lg text-gray-400 line-through">{price}</span>
-              <span className="text-2xl font-semibold text-emerald-600">{salePrice}</span>
-            </div>
-          ) : (
-            <div className="text-2xl font-medium text-brand-blue mt-2">{price}</div>
-          )}
+          <div className="text-2xl font-medium text-brand-blue mt-2">{price}</div>
         </div>
         
         {/* Description */}
